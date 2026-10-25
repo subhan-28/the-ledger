@@ -18,37 +18,77 @@
       <p class="empty-text">No entries recorded yet.</p>
     </div>
 
-    <div class="entries" *ngIf="expenseService.expenses().length > 0">
-<div class="entry-row" *ngFor="let e of expenseService.expenses(); let i = index" [style.animationDelay.ms]="i * 40">
-        <div class="entry-main">
-          <span class="entry-dot" [style.background]="getCategoryColor(e.category)"></span>
-          <div class="entry-info">
-            <span class="entry-category">{{ e.category }}</span>
-            <span class="entry-note" *ngIf="e.note">{{ e.note }}</span>
-            <span class="entry-date">{{ formatDate(e.date) }}</span>
-          </div>
+    <ng-container *ngIf="expenseService.expenses().length > 0">
+
+      <div class="filter-bar">
+        <div class="filter-field search-field">
+          <label for="search">Search</label>
+          <input
+            id="search"
+            type="text"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+            placeholder="Category or note"
+            autocomplete="off">
         </div>
-
-        <div class="entry-right">
-          <span class="entry-amount">Rs. {{ formatCurrency(e.amount) }}</span>
-
-          <div class="entry-actions" *ngIf="deleteConfirmId() !== e.id">
-            <a [routerLink]="['/edit', e.id]" class="icon-btn" aria-label="Edit">
-              <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <button type="button" class="icon-btn" (click)="askDelete(e.id)" aria-label="Delete">
-              <svg viewBox="0 0 24 24" width="15" height="15"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-
-          <div class="confirm-row" *ngIf="deleteConfirmId() === e.id">
-            <button type="button" class="confirm-yes" (click)="confirmDelete(e.id)">Delete</button>
-            <button type="button" class="confirm-no" (click)="cancelDelete()">Cancel</button>
-          </div>
+        <div class="filter-field">
+          <label for="month">Month</label>
+          <select
+            id="month"
+            [ngModel]="selectedMonth()"
+            (ngModelChange)="selectedMonth.set($event)">
+            <option value="all">All time</option>
+            <option *ngFor="let m of availableMonths()" [value]="m">{{ monthLabel(m) }}</option>
+          </select>
         </div>
-
       </div>
-    </div>
+
+      <div class="result-summary">
+        <span>{{ filteredExpenses().length }} of {{ expenseService.expenses().length }} entries</span>
+        <button type="button" class="clear-filters" *ngIf="filtersActive()" (click)="clearFilters()">
+          Clear filters
+        </button>
+        <span class="result-total">Rs. {{ formatCurrency(filteredTotal()) }}</span>
+      </div>
+
+      <div class="empty-state" *ngIf="filteredExpenses().length === 0">
+        <p class="empty-text">No entries match your search.</p>
+      </div>
+
+      <div class="entries" *ngIf="filteredExpenses().length > 0">
+        <div class="entry-row" *ngFor="let e of filteredExpenses(); let i = index" [style.animationDelay.ms]="i * 40">
+
+          <div class="entry-main">
+            <span class="entry-dot" [style.background]="getCategoryColor(e.category)"></span>
+            <div class="entry-info">
+              <span class="entry-category">{{ e.category }}</span>
+              <span class="entry-note" *ngIf="e.note">{{ e.note }}</span>
+              <span class="entry-date">{{ formatDate(e.date) }}</span>
+            </div>
+          </div>
+
+          <div class="entry-right">
+            <span class="entry-amount">Rs. {{ formatCurrency(e.amount) }}</span>
+
+            <div class="entry-actions" *ngIf="deleteConfirmId() !== e.id">
+              <a [routerLink]="['/edit', e.id]" class="icon-btn" aria-label="Edit">
+                <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+              <button type="button" class="icon-btn" (click)="askDelete(e.id)" aria-label="Delete">
+                <svg viewBox="0 0 24 24" width="15" height="15"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+
+            <div class="confirm-row" *ngIf="deleteConfirmId() === e.id">
+              <button type="button" class="confirm-yes" (click)="confirmDelete(e.id)">Delete</button>
+              <button type="button" class="confirm-no" (click)="cancelDelete()">Cancel</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </ng-container>
 
   </div>
 </div>

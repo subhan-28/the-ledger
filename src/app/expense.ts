@@ -2,10 +2,14 @@ import { Injectable, signal, computed } from '@angular/core';
 import { Expense } from './expense.model';
 
 const STORAGE_KEY = 'ledgerExpenses';
+const BUDGET_KEY = 'ledgerMonthlyBudget';
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
   private expensesSignal = signal<Expense[]>([]);
+  private budgetSignal = signal<number>(0);
+
+  budget = this.budgetSignal.asReadonly();
 
   expenses = computed(() =>
     [...this.expensesSignal()].sort((a, b) => b.date.localeCompare(a.date))
@@ -48,11 +52,33 @@ export class ExpenseService {
     } catch {
       this.expensesSignal.set([]);
     }
+
+    try {
+      const storedBudget = localStorage.getItem(BUDGET_KEY);
+      const parsed = storedBudget ? Number(storedBudget) : 0;
+      this.budgetSignal.set(Number.isFinite(parsed) && parsed > 0 ? parsed : 0);
+    } catch {
+      this.budgetSignal.set(0);
+    }
   }
 
   private saveToStorage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.expensesSignal()));
+    } catch {
+      // localStorage not available — fail silently
+    }
+  }
+
+  setBudget(amount: number) {
+    const value = Number.isFinite(amount) && amount > 0 ? amount : 0;
+    this.budgetSignal.set(value);
+    try {
+      if (value > 0) {
+        localStorage.setItem(BUDGET_KEY, String(value));
+      } else {
+        localStorage.removeItem(BUDGET_KEY);
+      }
     } catch {
       // localStorage not available — fail silently
     }

@@ -27,6 +27,60 @@
         </div>
       </div>
 
+      <div class="budget-section" [attr.data-status]="budgetStatus()">
+        <div class="budget-head">
+          <span class="section-label">Monthly Budget</span>
+          <button
+            type="button"
+            class="link-btn"
+            *ngIf="expenseService.budget() > 0 && !editingBudget()"
+            (click)="startEditBudget()">Edit</button>
+        </div>
+
+        <form class="budget-form" *ngIf="editingBudget()" (ngSubmit)="saveBudget()" novalidate>
+          <div class="budget-input-wrap">
+            <span class="currency-sign">Rs.</span>
+            <input
+              type="number"
+              [(ngModel)]="budgetInput"
+              name="budget"
+              min="0"
+              step="1"
+              placeholder="e.g. 20000"
+              autocomplete="off">
+          </div>
+          <div class="budget-form-actions">
+            <button type="submit" class="mini-primary">Save</button>
+            <button type="button" class="mini-secondary" (click)="cancelBudget()">Cancel</button>
+          </div>
+          <p class="budget-hint">Leave empty or 0 to remove the budget.</p>
+          <p class="budget-error" *ngIf="budgetError()">{{ budgetError() }}</p>
+        </form>
+
+        <div class="budget-empty" *ngIf="!editingBudget() && expenseService.budget() === 0">
+          <p>No budget set. Add a monthly limit to track your spending.</p>
+          <button type="button" class="mini-primary" (click)="startEditBudget()">Set Budget</button>
+        </div>
+
+        <div class="budget-info" *ngIf="!editingBudget() && expenseService.budget() > 0">
+          <div class="budget-numbers">
+            <span class="budget-spent">Rs. {{ formatCurrency(expenseService.thisMonthTotal()) }}</span>
+            <span class="budget-of">of Rs. {{ formatCurrency(expenseService.budget()) }}</span>
+          </div>
+          <div class="budget-track">
+            <div class="budget-fill" [style.width.%]="budgetBarWidth()"></div>
+          </div>
+          <div class="budget-foot">
+            <span class="budget-percent">{{ budgetPercent() | number:'1.0-0' }}% used</span>
+            <span class="budget-message">
+              {{ budgetRemaining() >= 0
+                ? 'Rs. ' + formatCurrency(budgetRemaining()) + ' remaining'
+                : 'Over by Rs. ' + formatCurrency(-budgetRemaining()) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div class="category-section">
         <span class="section-label">By Category</span>
         <div
