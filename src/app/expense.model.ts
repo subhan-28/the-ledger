@@ -12,11 +12,11 @@ export interface CategoryInfo {
 }
 
 export const CATEGORIES: CategoryInfo[] = [
-  { name: 'Food', color: '#8B1E1E' },
-  { name: 'Transport', color: '#2D5F3E' },
-  { name: 'Shopping', color: '#B8860B' },
-  { name: 'Bills', color: '#1C2541' },
-  { name: 'Entertainment', color: '#6B3FA0' },
-  { name: 'Health', color: '#1E6B8B' },
-  { name: 'Other', color: '#5B5B5B' },
+  { name: 'Food', color: '#B5413F' },
+  { name: 'Transport', color: '#3F8A5C' },
+  { name: 'Shopping', color: '#C9962B' },
+  { name: 'Bills', color: '#4A6FA5' },
+  { name: 'Entertainment', color: '#8A5FC0' },
+  { name: 'Health', color: '#2C8FB0' },
+  { name: 'Other', color: '#7C8088' },
 ];

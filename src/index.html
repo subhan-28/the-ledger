@@ -1,5 +1,12 @@
 <!doctype html>
 <html lang="en">
+  <script>
+  try {
+    var saved = localStorage.getItem('ledgerTheme');
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (dark) document.documentElement.classList.add('dark');
+  } catch (e) {}
+</script>
 <head>
   <meta charset="utf-8">
   <title>The Ledger — Personal Expense Tracker</title>

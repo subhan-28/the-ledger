@@ -3,15 +3,37 @@
 * { box-sizing: border-box; }
 
 :root {
+  color-scheme: light;
   --paper: #F2E8D5;
   --paper-line: rgba(28,37,65,0.12);
   --margin-red: #A23B3B;
   --ink: #1C2541;
+  --ink-rgb: 28,37,65;
   --ink-muted: #5b6472;
+  --border-strong: #1C2541;
+  --shadow-rgb: 28,37,65;
   --debit: #8B1E1E;
   --credit: #2D5F3E;
   --brass: #B8860B;
   --surface: #FBF6EA;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+html.dark {
+  color-scheme: dark;
+  --paper: #12161F;
+  --paper-line: rgba(233,224,204,0.07);
+  --margin-red: #C8605E;
+  --ink: #E9E0CC;
+  --ink-rgb: 233,224,204;
+  --ink-muted: #9AA0AD;
+  --border-strong: rgba(233,224,204,0.55);
+  --shadow-rgb: 0,0,0;
+  --debit: #E8837A;
+  --credit: #6FBF8B;
+  --brass: #D4A93C;
+  --surface: #1B2130;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
 }
 
 html, body {

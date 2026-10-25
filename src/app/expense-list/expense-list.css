@@ -8,6 +8,7 @@
   position: relative;
   padding: clamp(24px, 6vw, 56px) clamp(24px, 6vw, 64px) clamp(24px, 6vw, 56px) clamp(60px, 10vw, 100px);
   background:
+    var(--grain),
     repeating-linear-gradient(
       0deg,
       transparent 0 35px,
@@ -105,13 +106,13 @@ h1 {
   text-decoration: none;
   color: var(--ink);
   background: transparent;
-  border: 2px solid var(--ink);
+  border: 2px solid var(--border-strong);
   padding: 8px 16px;
   border-radius: 2px;
   transition: background 0.2s ease, transform 0.15s ease;
 }
 
-.btn-secondary:hover { background: rgba(28,37,65,0.06); transform: translateY(-2px); }
+.btn-secondary:hover { background: rgba(var(--ink-rgb), 0.07); transform: translateY(-2px); }
 
 /* ---- Filters ---- */
 .filter-bar {
@@ -153,7 +154,7 @@ h1 {
   color: var(--ink);
   background: transparent;
   border: none;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--border-strong);
   padding: 6px 2px 8px;
   outline: none;
   transition: border-color 0.2s ease;
@@ -222,7 +223,7 @@ h1 {
 }
 
 .entries:hover {
-  box-shadow: 0 10px 24px -14px rgba(28,37,65,0.25);
+  box-shadow: 0 10px 24px -14px rgba(var(--shadow-rgb), 0.35);
 }
 
 .entry-row {
@@ -318,7 +319,7 @@ h1 {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid var(--paper-line);
+  border: 1px solid rgba(var(--ink-rgb), 0.2);
   background: transparent;
   color: var(--ink-muted);
   cursor: pointer;
@@ -327,7 +328,7 @@ h1 {
 }
 
 .icon-btn:hover {
-  background: rgba(28,37,65,0.06);
+  background: rgba(var(--ink-rgb), 0.08);
   color: var(--ink);
 }
 
@@ -349,12 +350,12 @@ h1 {
 
 .confirm-yes {
   background: var(--debit);
-  color: #fff;
+  color: var(--surface);
 }
 
 .confirm-no {
   background: transparent;
-  border: 1px solid var(--paper-line);
+  border: 1px solid rgba(var(--ink-rgb), 0.25);
   color: var(--ink-muted);
 }
 
