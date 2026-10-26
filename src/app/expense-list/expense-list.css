@@ -378,3 +378,18 @@ h1 {
   .ledger-page { animation: none; }
   .entry-row { animation: none; opacity: 1; }
 }
+
+.btn-export {
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-export:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-export:disabled:hover {
+  background: transparent;
+  transform: none;
+}

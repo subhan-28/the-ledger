@@ -85,4 +85,60 @@ export class ExpenseList {
     this.expenseService.deleteExpense(id);
     this.deleteConfirmId.set(null);
   }
+
+  /* ---- CSV export ---- */
+
+  private csvText(value: string): string {
+    let text = value;
+
+    // Stop spreadsheets from treating user text as a formula
+    if (/^[=+\-@\t\r]/.test(text)) {
+      text = "'" + text;
+    }
+
+    // Quote cells that contain commas, quotes or line breaks
+    if (/[",\r\n]/.test(text)) {
+      text = '"' + text.replace(/"/g, '""') + '"';
+    }
+
+    return text;
+  }
+
+  private todayStamp(): string {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+
+  exportCsv() {
+    const rows = this.filteredExpenses();
+    if (rows.length === 0) return;
+
+    const lines: string[] = ['Date,Category,Note,Amount'];
+    for (const e of rows) {
+      lines.push(
+        [
+          this.csvText(e.date),
+          this.csvText(e.category),
+          this.csvText(e.note),
+          String(e.amount),
+        ].join(',')
+      );
+    }
+
+    // The BOM at the start makes Excel read the file as UTF-8
+    const csv = '\uFEFF' + lines.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const stamp = this.selectedMonth() !== 'all' ? this.selectedMonth() : this.todayStamp();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ledger-${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
 }
