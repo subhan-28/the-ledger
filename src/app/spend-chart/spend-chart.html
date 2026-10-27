@@ -1,0 +1,48 @@
+<section class="trend-section">
+  <div class="trend-head">
+    <div class="trend-titles">
+      <span class="section-label">Spending Trend</span>
+      <span class="trend-caption">{{ caption() }}</span>
+    </div>
+
+    <div class="seg" role="group" aria-label="Chart range">
+      <button type="button" [attr.aria-pressed]="view() === 'daily'" (click)="view.set('daily')">Daily</button>
+      <button type="button" [attr.aria-pressed]="view() === 'weekly'" (click)="view.set('weekly')">Weekly</button>
+    </div>
+  </div>
+
+  <p class="trend-empty" *ngIf="total() === 0">No spending recorded in this period.</p>
+
+  <ng-container *ngIf="total() > 0">
+    <div class="chart">
+      <div
+        class="bar-col"
+        *ngFor="let bar of bars(); let i = index"
+        [class.current]="bar.isCurrent"
+        role="img"
+        [attr.aria-label]="bar.fullLabel + ': Rs. ' + formatCurrency(bar.amount)"
+        [attr.title]="bar.fullLabel + ': Rs. ' + formatCurrency(bar.amount)">
+
+        <div class="bar-track">
+          <span
+            class="bar-value"
+            *ngIf="bar.amount > 0"
+            [style.bottom]="'max(' + bar.heightPct + '%, 3px)'"
+            [style.animationDelay.ms]="i * 50 + 350">{{ compact(bar.amount) }}</span>
+          <div
+            class="bar"
+            [class.zero]="bar.amount === 0"
+            [style.height.%]="bar.heightPct"
+            [style.animationDelay.ms]="i * 50"></div>
+        </div>
+
+        <span class="bar-label">{{ bar.label }}</span>
+      </div>
+    </div>
+
+    <div class="trend-foot">
+      <span>Total <strong>Rs. {{ formatCurrency(total()) }}</strong></span>
+      <span>Avg <strong>Rs. {{ formatCurrency(average()) }}</strong> / {{ view() === 'daily' ? 'day' : 'week' }}</span>
+    </div>
+  </ng-container>
+</section>

@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ExpenseService } from '../expense';
 import { CATEGORIES } from '../expense.model';
+import { SpendChart } from '../spend-chart/spend-chart';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, SpendChart],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
