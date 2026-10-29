@@ -1,15 +1,33 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Expense } from './expense.model';
+import {
+  Expense,
+  CategoryInfo,
+  CATEGORIES,
+  CUSTOM_COLORS,
+  MAX_CATEGORY_LENGTH,
+} from './expense.model';
 
 const STORAGE_KEY = 'ledgerExpenses';
 const BUDGET_KEY = 'ledgerMonthlyBudget';
+const CUSTOM_KEY = 'ledgerCustomCategories';
+const FALLBACK_COLOR = '#7C8088';
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
   private expensesSignal = signal<Expense[]>([]);
   private budgetSignal = signal<number>(0);
+  private customSignal = signal<CategoryInfo[]>([]);
 
   budget = this.budgetSignal.asReadonly();
+  customCategories = this.customSignal.asReadonly();
+
+  // Built-in categories, then your own, with "Other" always last
+  categories = computed<CategoryInfo[]>(() => {
+    const other = CATEGORIES.filter(c => c.name === 'Other');
+    const base = CATEGORIES.filter(c => c.name !== 'Other');
+    return [...base, ...this.customSignal(), ...other];
+  });
 
   expenses = computed(() =>
     [...this.expensesSignal()].sort((a, b) => b.date.localeCompare(a.date))
@@ -60,13 +78,39 @@ export class ExpenseService {
     } catch {
       this.budgetSignal.set(0);
     }
+
+    try {
+      const storedCustom = localStorage.getItem(CUSTOM_KEY);
+      const parsed = storedCustom ? JSON.parse(storedCustom) : [];
+      const valid: CategoryInfo[] = Array.isArray(parsed)
+        ? parsed.filter(
+            (c: any) =>
+              c &&
+              typeof c.name === 'string' &&
+              c.name.length > 0 &&
+              typeof c.color === 'string' &&
+              HEX_COLOR.test(c.color)
+          )
+        : [];
+      this.customSignal.set(valid);
+    } catch {
+      this.customSignal.set([]);
+    }
   }
 
   private saveToStorage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.expensesSignal()));
     } catch {
-      // localStorage not available — fail silently
+      // localStorage not available, fail silently
+    }
+  }
+
+  private saveCustom() {
+    try {
+      localStorage.setItem(CUSTOM_KEY, JSON.stringify(this.customSignal()));
+    } catch {
+      // localStorage not available, fail silently
     }
   }
 
@@ -80,7 +124,7 @@ export class ExpenseService {
         localStorage.removeItem(BUDGET_KEY);
       }
     } catch {
-      // localStorage not available — fail silently
+      // localStorage not available, fail silently
     }
   }
 
@@ -107,5 +151,49 @@ export class ExpenseService {
 
   getExpenseById(id: string): Expense | undefined {
     return this.expensesSignal().find(e => e.id === id);
+  }
+
+  /* ---- Categories ---- */
+
+  getCategoryColor(name: string): string {
+    return this.categories().find(c => c.name === name)?.color || FALLBACK_COLOR;
+  }
+
+  // Case-insensitive lookup, so "food" finds "Food"
+  findCategory(name: string): CategoryInfo | undefined {
+    const wanted = name.trim().toLowerCase();
+    return this.categories().find(c => c.name.toLowerCase() === wanted);
+  }
+
+  // Returns the category name to use, or null if the name is not valid
+  addCustomCategory(rawName: string): string | null {
+    const name = rawName.trim().replace(/\s+/g, ' ');
+    if (!name || name.length > MAX_CATEGORY_LENGTH) return null;
+
+    const existing = this.findCategory(name);
+    if (existing) return existing.name;
+
+    const usedColors = new Set(this.customSignal().map(c => c.color));
+    const color =
+      CUSTOM_COLORS.find(c => !usedColors.has(c)) ??
+      CUSTOM_COLORS[this.customSignal().length % CUSTOM_COLORS.length];
+
+    this.customSignal.update(list => [...list, { name, color }]);
+    this.saveCustom();
+    return name;
+  }
+
+  categoryUsageCount(name: string): number {
+    return this.expensesSignal().filter(e => e.category === name).length;
+  }
+
+  // Only your own categories can be removed, and only when no entry uses them
+  removeCustomCategory(name: string): boolean {
+    const isCustom = this.customSignal().some(c => c.name === name);
+    if (!isCustom || this.categoryUsageCount(name) > 0) return false;
+
+    this.customSignal.update(list => list.filter(c => c.name !== name));
+    this.saveCustom();
+    return true;
   }
 }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ExpenseService } from '../expense';
-import { CATEGORIES } from '../expense.model';
 
 @Component({
   selector: 'app-expense-list',
@@ -50,8 +49,8 @@ export class ExpenseList {
     () => this.selectedMonth() !== 'all' || this.searchTerm().trim() !== ''
   );
 
-  getCategoryColor(name: string): string {
-    return CATEGORIES.find(c => c.name === name)?.color || '#5B5B5B';
+    getCategoryColor(name: string): string {
+    return this.expenseService.getCategoryColor(name);
   }
 
   formatCurrency(amount: number): string {

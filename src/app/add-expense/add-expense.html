@@ -26,12 +26,37 @@
         </div>
       </div>
 
-      <div class="field">
+            <div class="field">
         <label for="category">Category</label>
-        <select id="category" [(ngModel)]="category" name="category">
+        <select
+          id="category"
+          [(ngModel)]="category"
+          (ngModelChange)="onCategoryChange()"
+          name="category">
           <option value="" disabled>Select a category</option>
-          <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
+          <option *ngFor="let cat of expenseService.categories()" [value]="cat.name">{{ cat.name }}</option>
+          <option [value]="ADD_NEW">+ Add your own category…</option>
         </select>
+
+        <div class="new-category" *ngIf="category === ADD_NEW">
+          <input
+            id="newCategory"
+            type="text"
+            [(ngModel)]="newCategory"
+            name="newCategory"
+            [attr.maxlength]="maxLength"
+            placeholder="e.g. Groceries"
+            autocomplete="off">
+          <span class="char-count">{{ newCategory.length }}/{{ maxLength }}</span>
+        </div>
+
+        <div class="category-tools" *ngIf="isCustomSelected()">
+          <button type="button" class="link-btn" (click)="removeSelectedCategory()">
+            Remove this category
+          </button>
+        </div>
+
+        <p class="hint-error" *ngIf="removeMsg()">{{ removeMsg() }}</p>
       </div>
 
       <div class="field">
